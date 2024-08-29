@@ -1,0 +1,209 @@
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    jQuery(document).ready(function() {
+        var c = 0,
+            k = 0;
+        $('.add_more_group').on('click', function(e) {
+            e.preventDefault();
+
+            $('.update-fields').removeClass('hidden');
+            var groupHtm = `
+                <div class="card addr bg-light">
+                <div class="row p-3">
+                <div class="col-3">
+                    <input type="text" name="group[` + c + `][group_name]" placeholder="Enter group name" class="form-control"
+                        required>
+                </div>
+                <div class="col-3">
+                    <select class="form-control" required name="group[` + c + `][type]">
+                        <option value="">--select type--</option>
+                        <option value="general">General</option>
+                        <option value="sum">Sum</option>
+                    </select>
+                </div>
+                <div class="col-3">
+                    <select class="form-control no_col" name="group[` + c + `][columns]">
+                        <option value="">--No. of columns--</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+
+                    </select>
+                </div>
+
+                <div class="col-3">
+                <button class="btn btn-danger remgp">Remove Option</button>
+                </div>
+
+            </div>
+
+            <div class="row p-3 col_none">
+                <div class="col-4">
+                    <input name="group[` + c + `][meta][` + k + `][meta_key]" class="form-control" placeholder="Name">
+                </div>
+                <div class="col-4">
+                    <input name="group[` + c + `][meta][` + k + `][meta_value]" class="form-control" placeholder="Value">
+                </div>
+                <div class="col-4">
+                    <button class="btn btn-success add-field" c="` + c + `" k="` + k + `"> Add Field </button>
+                </div>
+            </div>
+
+        </div>
+
+        `;
+
+            $('#groups').prepend(groupHtm);
+            c++;
+        })
+
+        $('body').delegate('.remgp', 'click', function(e) {
+            e.preventDefault();
+            var len = document.querySelectorAll('.addr').length;
+            if (len == 1) {
+                $('.update-fields').addClass('hidden');
+            }
+            $(this).parent().parent().parent().remove();
+        })
+
+        $('body').delegate('.add-field', 'click', function(e) {
+
+            e.preventDefault();
+            var c1 = parseInt($(this).attr('c'));
+            var k1 = parseInt($(this).attr('k')) + 1;
+            $(this).attr('k', k1);
+            var field_htm = `
+                <div class="row p-3">
+                <div class="col-4">
+                    <input name="group[` + c1 + `][meta][` + k1 + `][meta_key]" class="form-control" placeholder="Name">
+                </div>
+                <div class="col-4">
+                    <input name="group[` + c1 + `][meta][` + k1 + `][meta_value]" class="form-control" placeholder="Value">
+                </div>
+                <div class="col-4">
+                    <button class="btn btn-danger rem-field"> Remove Field </button>
+                </div>
+                </div>
+         `;
+            $(this).parent().parent().append(field_htm);
+        })
+
+        $('body').delegate('.rem-field', 'click', function(e) {
+            e.preventDefault();
+            $(this).parent().parent().remove();
+        })
+
+        $('.ed').click(function(e) {
+            e.preventDefault();
+
+            let mk = $(this).attr('meta_key');
+            let mv = $(this).attr('meta_value');
+            let id = $(this).attr('id');
+
+            $('.modal_meta_key').val(mk);
+            $('.modal_meta_value').val(mv);
+            $('.modal_meta_id').val(id);
+
+            $('#edit-meta-modal').modal('show');
+        });
+
+        $('body').delegate(".no_col", "change", function(e) {
+            let v = $(this).val();
+            $(this).parent().parent().find('.apcol').remove();
+            $(this).parent().parent().parent().find('.col_none').hide();
+            $(this).parent().parent().parent().find('.hvals').remove();
+            if (v == 0) {
+                $(this).parent().parent().parent().find('.col_none').show();
+                return;
+            }
+            let htm = '<div class="row apcol p-3">';
+            let hvals = '<div class="row p-3 hvals">';
+            for (i = 1; i <= v; i++) {
+                htm += `
+               <div class="col-3 p-1">
+               <input
+                name="headings[${i}][heading]"
+                class="form-control"
+                placeholder="Enter heading ${i}"
+                />
+                </div>
+               `;
+
+                hvals += `
+                <div class="col-3 p-1">
+                    <input
+                    name="headings[${i}][values][]"
+                    class="form-control"
+                    placeholder="Enter Value ${i}"
+                    />
+                </div>
+               `;
+            }
+            htm += "</div>";
+            hvals += `
+            <div class="col-3 p-1">
+                <button class="btn btn-success adval-btn" lp="${v}">Add Row</button>
+            </div>`;
+
+            $(this).parent().parent().append(htm);
+            $(this).parent().parent().append(hvals);
+
+        });
+
+        $("body").delegate(".adval-btn", "click", function(e) {
+            e.preventDefault();
+            let lp = $(this).attr('lp');
+            console.log(lp);
+            let hvals = '<div class="row p-3 hvals">';
+            for (i = 1; i <= lp; i++) {
+
+                hvals += `
+                <div class="col-3 p-1">
+                    <input
+                    name="headings[${i}][values][]"
+                    class="form-control"
+                    placeholder="Enter Value ${i}"
+                    />
+                </div>
+               `;
+            }
+
+            hvals += `
+            <div class="col-3 p-1">
+                <button class="btn btn-danger remval-btn" >Remove Row</button>
+            </div>`;
+
+            $(this).parent().parent().append(hvals);
+
+        });
+
+        $("body").delegate(".remval-btn", "click", function(e) {
+            e.preventDefault();
+            $(this).parent().parent().remove();
+        })
+
+    });
+
+    function confirmDeleteGroup(id) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: !0,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Delete it!"
+        }).then(t => {
+            t.isConfirmed && document.getElementById("delete-group-form" + id).submit()
+        })
+    }
+</script>
